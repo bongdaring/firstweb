@@ -1,0 +1,239 @@
+<html>
+<head>
+<title>슬기로운 고3 생활</title>
+<link rel="stylesheet" href="first.css">
+<meta charset="UTF-8" />
+<style type="text/css">
+    a { color:#000000;text-decoration:none; }
+    .scriptCalendar { text-align:center; }
+    .scriptCalendar > thead > tr > td { width:60px;height:60px; }
+    .scriptCalendar > thead > tr:first-child > td { font-weight:bold; font-size: 20px;}
+    .scriptCalendar > thead > tr:last-child > td { color: #466093;font-weight:bold; background-color:#D6F0FF}
+    .scriptCalendar > tbody > tr > td { width:60px;height:60px; }
+    #work{ width:360px; height: 40px; margin-top: 10px; margin-bottom: 20px; padding:0px 0px 0px 10px;}
+    #inputwork {font-size: 20px; height: 40px; font-weight:700;cursor: pointer; color: #466093; background-color: #D6F0FF}
+    #inputwork:active{background-color: #466093; color: #D6F0FF}
+</style>
+<script type="text/javascript">
+
+var workArr = new Array();
+//할일을 담아두는 배열
+  window.onload=function start(){
+//윈도우 시작시 불러오는 함수(localworklist에 있는거 가져오기)
+      var workcheck = localStorage.getItem("localworklist");
+      if(workcheck!=null){
+          var storedStorage = JSON.parse(workcheck);
+        for(var i=0;i<storedStorage.length;i++){
+          var newId = workArr.length+1;
+          var obj={
+                id:newId, year:storedStorage[i].year, month:storedStorage[i].month, date:storedStorage[i].date,
+                work:storedStorage[i].work
+            };
+          workArr.push(obj);
+         localStorage.setItem("localworklist",JSON.stringify(workArr));
+       }
+      }
+    Calendar();
+  };
+    var today = new Date();
+    var date = new Date();
+
+    function prev() {
+//전 달을로 가기
+        this.today = new Date(today.getFullYear(), today.getMonth()-1, today.getDate());
+        Calendar();
+    }
+
+    function next() {
+//다음 달로 가기
+        this.today = new Date(today.getFullYear(), today.getMonth()+1, today.getDate());
+        Calendar();
+    }
+
+
+    function Calendar() {
+//달력 생성 함수
+        var doMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        var lastDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        var tbCalendar = document.querySelector(".scriptCalendar > tbody");
+
+        document.getElementById("calYear").innerHTML = today.getFullYear();
+        document.getElementById("calMonth").innerHTML = today.getMonth() + 1;
+
+        while(tbCalendar.rows.length > 0) {
+            tbCalendar.deleteRow(tbCalendar.rows.length - 1);
+        }
+        var row = tbCalendar.insertRow();
+        var dom = 1;
+        var daylen = (Math.ceil((doMonth.getDay() + lastDate.getDate()) / 7) * 7) - doMonth.getDay();
+
+        for(var day = 1 - doMonth.getDay(); daylen >= day; day++) {
+            var column = row.insertCell();
+            if(Math.sign(day) == 1 && lastDate.getDate() >= day) {
+                column.innerText = day;
+                if(dom % 7 == 1) {
+                    column.style.color = "RED";
+                }
+
+                if(dom % 7 == 0) {
+                    column.style.color = "BLUE";
+                    row = tbCalendar.insertRow();
+                }
+            }
+            if(today.getFullYear() == date.getFullYear()&&today.getMonth() == date.getMonth()&&date.getDate() == day) {
+                       column.style.backgroundColor = "#FAED7D";
+                       column.style.cursor = "pointer";
+                       column.onclick = function(){ Calchoice(this); }
+                   }
+            else{
+              column.style.backgroundColor = "#FFFFFF";
+              column.style.cursor = "pointer";
+              column.onclick = function(){ Calchoice(this);}
+            }
+            dom++;
+        }
+    }
+
+    var realdate="";
+    var realyear="";
+    var realmonth="";
+
+    function Calchoice(column) {
+//날짜가 선택되었을때
+        if(document.getElementsByClassName("choiceDay")[0]) {
+        //이미 선택된 날짜가 있으면 초기화
+            document.getElementsByClassName("choiceDay")[0].style.backgroundColor = "#FFFFFF";
+            document.getElementsByClassName("choiceDay")[0].classList.remove("choiceDay");
+        }
+        column.style.backgroundColor = "#FFA7A7";
+        var year=document.getElementById("calYear").innerHTML;
+        var month=document.getElementById("calMonth").innerHTML;
+        var date = column.innerHTML;
+        if(date==""){
+            column.style.backgroundColor = "#FFFFFF";
+            column.classList.remove("choiceDay");
+        }
+
+        else {
+          alert(month+"월 "+date+"일에 할 일을 작성해주세요!");
+          realdate=date;
+          realyear=year;
+          realmonth=month;
+          loadlist(year,month,date);
+          column.classList.add("choiceDay");
+        }
+    }
+
+    function loadlist(year,month,date){
+//날짜별로 할일을 가져오는 함수
+      document.getElementById("list").innerHTML="";
+    var workcheck = localStorage.getItem("localworklist");
+        if(workcheck!=null){
+         var storedStorage = JSON.parse(workcheck);
+         for(var i=0;i<storedStorage.length;i++){
+           if(storedStorage[i].year==year&&storedStorage[i].month==month&&storedStorage[i].date==realdate){
+             var li = document.createElement("li");
+             var del=document.createElement("button");
+             //var newId = workArr.length+1;
+             li.id=storedStorage[i].id;
+             var delUni = '<input type="button" onClick="deletes(this)" value="❌"/>';
+             li.innerHTML=storedStorage[i].work+" "+delUni+"<hr>";
+             var ol = document.getElementById("list");
+             ol.appendChild(li);
+           }
+          }
+      }
+}
+
+function deletes(obj){
+//할일을 지우는 함수
+        var p=obj.parentElement;
+         var pp = p.parentElement;
+        pp.removeChild(p);
+        var key =p.id;
+        for(var i=0;i<workArr.length;i++){
+          if(key==workArr[i].id){
+                workArr.splice(i,1);
+            }
+        localStorage.setItem("localworklist",JSON.stringify(workArr));
+      }
+     alert("삭제되었습니다");
+}
+
+    function Addwork(){
+//할일을 추가하는 함수
+      var inputwork = document.getElementById("work");
+      var year=document.getElementById("calYear").innerHTML;
+        var month=document.getElementById("calMonth").innerHTML;
+        var date = realdate;
+    if(inputwork.value!=""){
+      if(date==""){
+        alert("날짜를 선택해주세요");
+      }
+     else {
+       var newId = workArr.length+1;
+    var li = document.createElement("li");
+
+      var del=document.createElement("button");
+       li.id=newId;
+       var save=document.createElement("button");
+       var delUni = '<input type="button" onClick="deletes(this)" value="❌"/>';
+      li.innerHTML=inputwork.value+" "+delUni+"<hr>";
+      //del.addEventListener('click',deletes);
+
+      var ol = document.getElementById("list");
+      ol.appendChild(li);
+      var obj={
+            id:newId, year:year, month:month, date:date, work:work.value
+        };
+
+      workArr.push(obj);
+      localStorage.setItem("localworklist",JSON.stringify(workArr));
+      alert("할 일이 추가되었습니다");
+        }
+    }
+       inputwork.value="";
+    }
+
+</script>
+</head>
+<body>
+  <h1>📖슬기로운 고3 생활📖</h1>
+  <hr/>
+  <leftdiv id="grid">
+      <lft>
+        <ul>
+          <li><a href="today.html"><strong>오늘의 할 일 보기</strong></a></li>
+          <li><a href="cal.html"><strong>날짜별 할 일</strong></a></li>
+          <li><a href="timer.html"><strong>수능처럼 공부하기</strong></a></li>
+          <li><a href="hello.html"><strong>나의 기록</strong></a></li>
+          <li><a href="http://www.jinhakapply.com/"><strong>진학사 어플라이</strong></a></li>
+          </ul>
+    </lft>
+        <article id="article">
+          <table class="scriptCalendar">
+              <thead>
+                  <tr>
+                      <td onClick="prev();" style="cursor:pointer;">◀◁</td>
+                      <td colspan="5">
+                          <span id="calYear">YYYY</span>년
+                          <span id="calMonth">MM</span>월
+                      </td>
+                      <td onClick="next();" style="cursor:pointer;">▷▶</td>
+                  </tr>
+                  <tr>
+                      <td>일</td><td>월</td><td>화</td><td>수</td><td>목</td><td>금</td><td>토</td>
+                  </tr>
+              </thead>
+              <tbody></tbody>
+          </table>
+          <input type="text" id="work" placeholder="이날 할일 추가하기">
+            <input id="inputwork" type = "button" value = "추가하기" onclick="Addwork()">
+            <form name = "new" method="get">
+                <fieldset  id ="listfield" style="overflow:auto; width:435px; height:150px;">
+                  <worklist id="list"></worklist>
+             </fieldset>
+          </article>
+          <br>
+</body>
+</html>

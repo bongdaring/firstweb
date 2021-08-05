@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="first.css">
+  <title>수험생 다이어리</title>
+
+  <style>
+  article { margin-left: 50px}
+  #selid { font-size:20px; height: 32px;}
+  #countdown { font-size:50px; margin-left: 100px; color:RED;  font-weight:bold;}
+  #countbtn { width: 100px; height: 30px; text-align: center; font-weight: bold;}
+  #countbtn:active {color:#F15F5F}
+  </style>
+</head>
+
+<body>
+  <h1>📖슬기로운 고3 생활📖</h1>
+  <hr/>
+  <leftdiv id="grid">
+      <lft>
+        <ul>
+          <li><a href="today.html"><strong>오늘의 할 일 보기</strong></a></li>
+          <li><a href="cal.html"><strong>날짜별 할 일</strong></a></li>
+          <li><a href="timer.html"><strong>수능처럼 공부하기</strong></a></li>
+          <li><a href="hello.html"><strong>나의 기록</strong></a></li>
+          <li><a href="http://www.jinhakapply.com/"><strong>진학사 어플라이</strong></a></li>
+          </ul>
+    </lft>
+  <article id="article">
+    <form action="" name="frm">
+        <h2 id="exam">수능 과목시간에 맞춰서 문제풀기✍</h2><br>
+        <select id="selid" name="myChoice">
+          <option>시험볼 과목을 선택해주세요</option>
+          <option value="4800">국어</option>
+          <option value="6000">수학</option>
+          <option value="4200">영어</option>
+          <option value="1800">한국사</option>
+          <option value="1800">탐구1</option>
+          <option value="1800">탐구2</option>
+          <option value="10">테스트</option>
+        </select>
+        <input id="countbtn" type="button" value="시험시작" onclick="teststart()">
+        <br><br>
+        <span id="countdown"></span>
+        <br><br>
+    </form>
+</article>
+
+  <script type="text/javascript">
+    var count = 0;
+    var time = 0;
+    var choice = 0;
+    var minute = 0;
+    var t = 0;
+    function teststart() {
+      clearInterval(time); // 타이머 우선 초기화 시켜주기(time initialize)
+      /*
+
+          ID로 가져오기
+         // select의 value를 가져오기 : value
+         var val = document.getElementById("selid").value;
+         alert(val);   // 확인용
+         // select의 index값을 가져오기 : selectedIndex
+         var indexNum = document.getElementById("selid").selectedIndex;
+         alert(indexNum);   // 확인용
+       */
+
+
+      //    name으로 index 찾기
+      choice = document.frm.myChoice.selectedIndex;
+      //   alert(choice);
+
+      // 찾은 index로 value찾기
+      count = parseInt(document.frm.myChoice.options[choice].value);
+
+      // 타이머 함수 1초씩 호출하는 함수 만들기
+      time = setInterval("testTimer()", 1000);
+      if(choice == 1){
+        document.getElementById("exam").innerHTML="지금은 국어시간입니다. 시간은 80분 주어집니다.";
+      }
+      else if(choice == 2){
+        document.getElementById("exam").innerHTML="지금은 수학시간입니다. 시간은 100분 주어집니다.";
+      }
+      else if(choice == 3){
+        document.getElementById("exam").innerHTML="지금은 영어시간입니다. 시간은 70분 주어집니다.";
+      }
+      else if(choice == 4){
+        document.getElementById("exam").innerHTML="지금은 한국사시간입니다. 시간은 30분 주어집니다.";
+      }
+      else if(choice == 5){
+        document.getElementById("exam").innerHTML="지금은 탐구1시간입니다. 시간은 30분 주어집니다.";
+      }
+      else if(choice == 6){
+        document.getElementById("exam").innerHTML="지금은 탐구2시간입니다. 시간은 30분 주어집니다.";
+      }
+      else {
+        alert("시간을 선택해주세요!");
+      }
+    }
+
+    function testTimer() {
+      minute = parseInt(count/60);
+      t=parseInt(count-(minute*60));
+      count = count - 1; // 타이머 선택 숫자에서 -1씩 감산함(갱신되기 때문)
+
+      document.getElementById("countdown").innerHTML = minute+" : "+t;
+      if (minute==0 &&t==0) {
+            clearInterval(time); // 시간 초기화
+            var audio = new Audio();
+            audio.src = "./al.mp3";
+            audio.play();
+            document.getElementById("countdown").innerHTML="시험종료!";
+
+      }
+    }
+
+
+  </script>
+</body>
+</html>

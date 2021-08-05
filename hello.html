@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="first.css">
+  <title>슬기로운 고3 생활</title>
+  <style>
+  input { all: unset; border-radius: 5px; border: 1px solid rgba(0, 0, 0, 0.5);}
+  #titleinput,#contentinput { width: 500px; padding: 5px 10px; margin-bottom: 10px;}
+  #contentinput { height: 100px;}
+  #inputdiary { all: unset; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 5px; padding: 5px 10px;}
+  #formlist { margin-top: 20px; }
+  #inputdiary{ margin-left: 210px; }
+  button:active {  transform: scale(0.93);}
+  fieldset{border-radius: 8px;}
+  #searchlist{ border-radius: 5px; height: 31px; margin-top: 10px; font-weight: bold; font-size: 15px;}
+  #value{ width: 350px; height: 30px; padding:0px 0px 0px 10px;}
+  #searchbtn{ height: 30px;width: 78px; text-align: center; font-weight: bold;}
+  #listload li{font-size: 18px;}
+</style>
+</head>
+
+<body>
+
+  <h1>📖슬기로운 고3 생활📖</h1>
+  <hr/>
+  <leftdiv id="grid">
+      <lft>
+        <ul>
+            <li><a href="today.html"><strong>오늘의 할 일 보기</strong></a></li>
+            <li><a href="cal.html"><strong>날짜별 할 일</strong></a></li>
+            <li><a href="timer.html"><strong>수능처럼 공부하기</strong></a></li>
+            <li><a href="hello.html"><strong>나의 기록</strong></a></li>
+            <li><a href="http://www.jinhakapply.com/"><strong>진학사 어플라이</strong></a></li>
+          </ul>
+    </lft>
+    <article id="article">
+      <select id="searchlist">
+      <option value='' selected>-- 선택 --</option>
+      <option value='name'>제목</option>
+      <option value='where'>날짜</option>
+    </select>
+    <input type="text" id="value" placeholder="찾을 키워드를 검색하세요 ">
+<input id="searchbtn" type = "button" value = "검색하기" onclick="isreal()">
+        <form id="formlist" name = "new" method="get">
+          <fieldset  style="overflow:auto; width:500px; height:200px;">
+            <songlist id="listload"></songlist>
+          </fieldset>
+        </form>
+      <br/>
+
+        <form name = "new" method="get">
+          <fieldset  style="overflow:auto; width:500px; height:200px;">
+            <songlist id="listshow"></songlist>
+          </fieldset>
+        </form>
+        <br/>
+
+          <form action="#" class="editor__form" id="editor-form">
+            <input type="text" id="titleinput" placeholder="제목" />
+            <input type="text" id="contentinput" placeholder="내용"/>
+          </form>
+          <button class="addbtn" id="inputdiary" onclick="adddiary()">작성 완료</button>
+      </article>
+<script>
+
+var title = document.getElementById("titleinput");
+var content = document.getElementById("contentinput");
+var boardlist = new Array();
+var date = new Date();
+var tMonth = date.getMonth()+1;
+
+window.onload=function start(){
+  var lists = localStorage.getItem("localboardlist");
+  var storedStorage = JSON.parse(lists);
+  for(var i=0;i<storedStorage.length;i++){
+    var obj={
+      id:storedStorage[i].id, title:storedStorage[i].title, content:storedStorage[i].content, today:storedStorage[i].today
+    };
+    boardlist.push(obj);
+    localStorage.setItem("localboardlist",JSON.stringify(boardlist));
+  }
+  showBoardLists();
+};
+
+function adddiary(){
+  if(title.value!="" && content.value!=""){
+    var newId = boardlist.length+1;
+    var today = date.getFullYear()+"."+tMonth+"."+date.getDate();
+    var li = document.createElement("li");
+    li.id=newId;
+      var showbtn = '<input type="button" onclick="show(this)" value="보기"/>';
+    var delbtn = '<input type="button" onClick="deletes(this)" value="삭제"/>';
+    li.innerHTML=newId+"   "+title.value+" "+today +" "+showbtn+" "+delbtn+"<hr>";
+    var ol = document.getElementById("listload");
+    ol.appendChild(li);
+
+    alert(today);
+    var obj={
+      id:newId, title:title.value, content:content.value, today:today
+    };
+    boardlist.push(obj);
+    localStorage.setItem("localboardlist",JSON.stringify(boardlist));
+  }
+  title.value="";
+  content.value="";
+
+}
+
+function showBoardLists() {
+  var lists = localStorage.getItem("localboardlist");
+  if(lists!=null){
+    var storedStorage = JSON.parse(lists);
+    for(var i=0;i<storedStorage.length;i++){
+      var li = document.createElement("li");
+      var showbtn = '<input type="button" onclick="show(this)" value="보기"/>';
+      var delbtn = '<input type="button" onClick="deletes(this)" value="삭제"/>';
+      li.id=storedStorage[i].id;
+      li.innerHTML=storedStorage[i].id+"   "+storedStorage[i].title+" "+storedStorage[i].today +" "+showbtn+" "+delbtn+"<hr>";
+      var ol = document.getElementById("listload");
+      ol.appendChild(li);
+    }
+  }
+}
+
+function show(obj){
+  var ol = document.getElementById("listshow");
+  ol.innerHTML="";
+  var p=obj.parentElement;
+  var key = p.id;
+  for(var i=0;i<boardlist.length;i++){
+    if(key==boardlist[i].id){
+      var dia = document.createElement("dia");
+      dia.innerHTML=boardlist[i].today+" 일기"+"<hr>"+"제목 : "+boardlist[i].title+"<hr>"+boardlist[i].content;
+      var ol = document.getElementById("listshow");
+      ol.appendChild(dia);
+    }
+  }
+}
+
+var selected = document.getElementById('searchlist');
+var search = document.getElementById('value');
+var searArr= new Array();
+
+function isreal(){
+  searArr=[];
+var checksearch = selected.options[selected.selectedIndex].text;
+document.getElementById("listload").innerHTML="";
+
+if(checksearch=="제목"){
+  for(var i=0;i<boardlist.length;i++){
+    if(boardlist[i].title.indexOf(search.value)!=-1){
+      var li = document.createElement("li");
+      li.id=boardlist[i].id;
+      var showbtn = '<input type="button" onclick="show(this)" value="보기"/>';
+       var delbtn = '<input type="button" onClick="deletes(this)" value="삭제"/>';
+      li.innerHTML+=boardlist[i].id+" "+boardlist[i].title
+      +" "+boardlist[i].today+" "+showbtn+" "+delbtn+" "+"<br><hr>";
+      var ol = document.getElementById("listload");
+      ol.appendChild(li);
+    }
+  }
+}
+
+else if(checksearch=="날짜"){
+  for(var i=0;i<boardlist.length;i++){
+    if(boardlist[i].today.indexOf(search.value)!=-1){
+      var li = document.createElement("li");
+      li.id=boardlist[i].id;
+      var showbtn = '<input type="button" onclick="show(this)" value="보기"/>';
+       var delbtn = '<input type="button" onClick="deletes(this)" value="삭제"/>';
+      li.innerHTML+=boardlist[i].id+" "+boardlist[i].title
+      +" "+boardlist[i].today+" "+showbtn+" "+delbtn+" "+"<br><hr>";
+      var ol = document.getElementById("listload");
+      ol.appendChild(li);
+      }
+  }
+}
+else{
+    alert("검색할 항목을 선택해주세요!");
+    start();
+}
+search.value="";
+}
+
+function deletes(obj){
+//할일을 지우는 함수
+        var p=obj.parentElement;
+         var pp = p.parentElement;
+        pp.removeChild(p);
+        var key =p.id;
+        for(var i=0;i<boardlist.length;i++){
+          if(key==boardlist[i].id){
+                boardlist.splice(i,1);
+            }
+        localStorage.setItem("localboardlist",JSON.stringify(boardlist));
+      }
+     alert("삭제되었습니다");
+}
+
+
+
+</script>
+</body>
+</html>

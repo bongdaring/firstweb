@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="first.css">
+    <title>슬기로운 고3 생활</title>
+<style media="screen">
+  h2 { font-size: 30px;}
+  h3 { font-size: 25px;}
+  fieldset{border-radius: 8px;}
+
+</style>
+  </head>
+  <body>
+    <h1>📖슬기로운 고3 생활📖</h1>
+    <hr/>
+    <leftdiv id="grid">
+        <lft>
+          <ul>
+            <li><a href="today.html"><strong>오늘의 할 일 보기</strong></a></li>
+            <li><a href="cal.html"><strong>날짜별 할 일</strong></a></li>
+            <li><a href="timer.html"><strong>수능처럼 공부하기</strong></a></li>
+            <li><a href="hello.html"><strong>나의 기록</strong></a></li>
+            <li><a href="http://www.jinhakapply.com/"><strong>진학사 어플라이</strong></a></li>
+            </ul>
+      </lft>
+    <article id="article">
+    <h2>오늘의 할 일</h2>
+    <h3 id="today"></h3>
+    <form name = "new" method="get">
+    <fieldset  style="overflow:auto; width:500px; height:200px;">
+      <twlist id="list"></twlist>
+ </fieldset>
+</form>
+
+
+
+      <h3>오늘 한 일!😆</h3>
+      <form name = "new" method="get">
+      <fieldset  style="overflow:auto; width:500px; height:150px;">
+        <dolist id="dolist"></dolist>
+   </fieldset>
+  </form>
+
+      <br/>
+      <h3>오늘 못한 일🙁</h3>
+
+      <form name = "new" method="get">
+      <fieldset  style="overflow:auto; width:500px; height:150px;">
+          <nolist id="nolist"></nolist>
+   </fieldset>
+  </form>
+
+
+</article>
+<script type="text/javascript">
+  var twArr = new Array();//오늘 할일 배열
+  var today = new Date();
+  var doArr = new Array(); //한일 배열
+  var noArr = new Array(); //못한일 배열
+ var tMonth = today.getMonth()+1;
+ var into = today.getFullYear()+"."+tMonth+"."+today.getDate();
+var todaylist = document.getElementById("list");
+  window.onload=function start(){
+    var date = document.getElementById("today");
+    date.innerHTML=+today.getFullYear()+"년 "+tMonth+"월 "+today.getDate()+"일의 해야하는 일!";
+  loadlists();
+
+};
+
+function loadlists(){
+  twArr=[];
+    var workcheck = localStorage.getItem("localworklist");
+        if(workcheck!=null){
+         var storedStorage = JSON.parse(workcheck);
+         for(var i=0;i<storedStorage.length;i++){
+           if(storedStorage[i].year==today.getFullYear()
+           &&storedStorage[i].month==tMonth
+           &&storedStorage[i].date==today.getDate()){
+              var newId = twArr.length+1;
+             var obj={
+           id:newId, today:into, work:storedStorage[i].work};
+       twArr.push(obj);
+       localStorage.setItem("localtwlist",JSON.stringify(twArr));
+             var li = document.createElement("li");
+             li.id=newId;
+             var dobutton = '<input type="button" onClick="dowork(this)" value="😆"/>';
+             var nobutton = '<input type="button" onClick="nowork(this)" value="🙁"/>';
+             li.innerHTML=storedStorage[i].work+" "+dobutton+nobutton+"<hr>";
+             todaylist.appendChild(li);
+           }
+          }
+      }
+      donoload("localdolist",doArr,"dolist");
+      donoload("localnolist",noArr,"nolist");
+}
+
+function donoload(local,arr,inn){
+//한 일 못한 일 리스트 가져오기
+  var donocheck = localStorage.getItem(local);
+  if(donocheck!=null){
+    var storedStorage = JSON.parse(donocheck);
+      for(var i=0;i<storedStorage.length;i++){
+        var ol = document.getElementById(inn);
+        if(storedStorage[i].today!=into || todaylist.innerHTML==""){
+               arr=[];
+              localStorage.setItem(local,JSON.stringify(arr));
+              ol.innerHTML="";
+        }
+
+        else{
+          var newId = arr.length+1;
+          var obj={
+         id:newId, work:storedStorage[i].work, today:storedStorage[i].today};
+         arr.push(obj);
+         localStorage.setItem(local,JSON.stringify(arr));
+         var li = document.createElement("li");
+         li.id=newId;
+         li.innerHTML=storedStorage[i].work+"<hr>";
+         ol.appendChild(li);
+          }
+      }
+  }
+}
+
+function dowork(obj){//성공한 일
+  var p=obj.parentElement;
+        var key =p.id;
+        for(var i=0;i<twArr.length;i++){
+          if(key==twArr[i].id){
+            var li = document.createElement("li");
+            var newId = doArr.length+1;
+            li.id=newId;
+            li.innerHTML=twArr[i].work+" "+"<hr>";
+            var ol = document.getElementById("dolist");
+            ol.appendChild(li);
+            var obj={
+               id:newId, work:twArr[i].work, today:twArr[i].today
+           };
+           doArr.push(obj);
+         localStorage.setItem("localdolist",JSON.stringify(doArr));
+        }
+      }
+}
+
+function nowork(obj){//실패한 일
+  var p=obj.parentElement;
+        var key =p.id;
+        for(var i=0;i<twArr.length;i++){
+          if(key==twArr[i].id){
+            var li = document.createElement("li");
+            var newId = noArr.length+1;
+            li.id=newId;
+            li.innerHTML=twArr[i].work+" "+"<hr>";
+            var ol = document.getElementById("nolist");
+            ol.appendChild(li);
+            var obj={
+               id:newId, work:twArr[i].work,today:twArr[i].today
+           };
+           noArr.push(obj);
+         localStorage.setItem("localnolist",JSON.stringify(noArr));
+        }
+      }
+}
+
+</script>
+  </body>
+</html>
